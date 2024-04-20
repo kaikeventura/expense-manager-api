@@ -8,7 +8,7 @@ import java.time.YearMonth
 
 @Entity
 @Table(
-    name = "statements",
+    name = "invoices",
     uniqueConstraints = [
         UniqueConstraint(columnNames = ["user", "referenceMonth"])
     ]
