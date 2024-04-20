@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.time.YearMonth
 
 @SpringBootTest
 class InvoiceServiceIntegrationTest : TestContainersConfiguration() {
@@ -62,7 +63,7 @@ class InvoiceServiceIntegrationTest : TestContainersConfiguration() {
         val firstInvoice = invoiceRepository.findAll().first()
         val futureInvoice = invoiceService.createFutureInvoice(user)
 
-        val expectedNextReferenceMonth = firstInvoice.referenceMonth.plusMonths(1)
+        val expectedNextReferenceMonth = YearMonth.parse(firstInvoice.referenceMonth).plusMonths(1)
 
         assertEquals(expectedNextReferenceMonth, futureInvoice.referenceMonth)
     }
