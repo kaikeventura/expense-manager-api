@@ -12,4 +12,5 @@ interface InvoiceRepository : JpaRepository<InvoiceEntity, String> {
     fun findByUserIdAndReferenceMonth(userId: String, referenceMonth: YearMonth): InvoiceEntity?
     fun countByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: YearMonth): Int
     fun findAllByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: YearMonth, limit: Limit): List<InvoiceEntity>
+    fun findAllByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: YearMonth): List<InvoiceEntity>
 }

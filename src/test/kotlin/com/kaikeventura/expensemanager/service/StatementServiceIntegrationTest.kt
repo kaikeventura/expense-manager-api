@@ -1,18 +1,15 @@
 package com.kaikeventura.expensemanager.service
 
 import com.kaikeventura.expensemanager.configuration.TestContainersConfiguration
-import com.kaikeventura.expensemanager.controller.request.RegisterRequest
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
-import com.kaikeventura.expensemanager.entity.StatementType
-import com.kaikeventura.expensemanager.entity.StatementType.CREDIT_CARD
-import com.kaikeventura.expensemanager.entity.StatementType.IN_CASH
+import com.kaikeventura.expensemanager.entity.Role
+import com.kaikeventura.expensemanager.entity.StatementType.*
 import com.kaikeventura.expensemanager.entity.UserEntity
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
 import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,27 +30,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
     private lateinit var invoiceService: InvoiceService
 
     @Autowired
-    private lateinit var authenticationService: AuthenticationService
-
-    @Autowired
     private lateinit var statementService: StatementService
-
-    private lateinit var user: UserEntity
-
-    @BeforeEach
-    fun setup() {
-        authenticationService.register(
-            request = RegisterRequest(
-                username = "Donnie",
-                email = "donnie@gmail.com",
-                password = "123"
-            )
-        )
-
-        invoiceService.createFirstInvoiceForAllUsers()
-
-        user = userRepository.findAll().single()
-    }
 
     @AfterEach
     fun down() {
@@ -64,6 +41,9 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
 
     @Test
     fun `it should create a in cash expense`() {
+        val user = anUser("anyoneuser@gmail.com")
+        invoiceService.createFirstInvoiceForAllUsers()
+
         val invoice = invoiceRepository.findAll().single()
         statementService.createStatement(
             userEmail = user.email,
@@ -88,6 +68,9 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
 
     @Test
     fun `it should create a credit card expense with one installment`() {
+        val user = anUser("anytwouser@gmail.com")
+        invoiceService.createFirstInvoiceForAllUsers()
+
         val invoice = invoiceRepository.findAll().single()
         statementService.createStatement(
             userEmail = user.email,
@@ -113,6 +96,9 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
 
     @Test
     fun `it should create a credit card expense with multiple installments`() {
+        val user = anUser("anythreeuser@gmail.com")
+        invoiceService.createFirstInvoiceForAllUsers()
+
         val invoice = invoiceRepository.findAll().single()
         statementService.createStatement(
             userEmail = user.email,
@@ -141,4 +127,51 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             assertEquals(100_10, statement.value)
         }
     }
+
+    @Test
+    fun `it should create a fixed expense in all invoices`() {
+        val user = anUser("anyfouruser@gmail.com")
+        invoiceService.createFirstInvoiceForAllUsers()
+
+        repeat(3) {
+            invoiceService.createFutureInvoice(user)
+        }
+
+        val invoice = invoiceRepository.findAll().minByOrNull { it.referenceMonth }!!
+        statementService.createStatement(
+            userEmail = user.email,
+            statementRequest = StatementRequest(
+                description = "House financing",
+                value = 2000_00L,
+                type = FIXED,
+                referenceMonth = invoice.referenceMonth
+            )
+        )
+
+        invoiceRepository.findAll().filter { it.user.id == user.id }.also {
+            assertEquals(it.size, 4)
+        }.forEach {
+            assertEquals(2000_00L, it.totalValue)
+        }
+
+        statementRepository.findAllByInvoiceUserId(user.id!!).also {
+            assertEquals(it.size, 4)
+        }.sortedBy {
+            it.createdAt
+        }.forEach { statement ->
+            assertEquals("House financing", statement.description)
+            assertEquals(FIXED, statement.type)
+            assertEquals(2000_00L, statement.value)
+        }
+    }
+
+    private fun anUser(email: String): UserEntity =
+        userRepository.save(
+            UserEntity(
+                name = "Any User",
+                email = email,
+                pass = "123",
+                role = Role.USER
+            )
+        )
 }

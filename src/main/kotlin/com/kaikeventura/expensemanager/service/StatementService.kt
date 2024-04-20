@@ -4,6 +4,7 @@ import com.kaikeventura.expensemanager.controller.request.StatementRequest
 import com.kaikeventura.expensemanager.entity.InvoiceEntity
 import com.kaikeventura.expensemanager.entity.StatementEntity
 import com.kaikeventura.expensemanager.entity.StatementType.CREDIT_CARD
+import com.kaikeventura.expensemanager.entity.StatementType.FIXED
 import com.kaikeventura.expensemanager.error.exception.UserNotFoundException
 import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
@@ -22,11 +23,11 @@ class StatementService(
         userEmail: String,
         statementRequest: StatementRequest
     ) {
-        if (statementRequest.type != CREDIT_CARD) {
-            createUniqueStatement(userEmail, statementRequest)
+        when (statementRequest.type) {
+            CREDIT_CARD -> createCreditCardStatement(userEmail, statementRequest)
+            FIXED -> createMultipleStatementsForFixedExpense(userEmail, statementRequest)
+            else -> createUniqueStatement(userEmail, statementRequest)
         }
-
-        createCreditCardStatement(userEmail, statementRequest)
     }
 
     private fun createCreditCardStatement(
@@ -81,7 +82,7 @@ class StatementService(
                 statementRepository.save(
                     StatementEntity(
                         code = statementRequest.code.toString(),
-                        description = statementRequest.description.plus(" ${index + 1}/${statementRequest.installmentAmount}"),
+                        description = normalizeCreditCardDescription(statementRequest, index),
                         value = installmentValue,
                         type = statementRequest.type,
                         invoice = invoice
@@ -90,6 +91,39 @@ class StatementService(
                 invoice.recalculateInvoiceValue(installmentValue)
             }
         } ?: throw UserNotFoundException("User $userEmail not found")
+    }
+
+    private fun createMultipleStatementsForFixedExpense(userEmail: String, statementRequest: StatementRequest) {
+        userRepository.findByEmail(userEmail)?.let { user ->
+            val invoices = invoiceService.getAllInvoices(
+                user,
+                statementRequest.referenceMonth
+            )
+
+            invoices.sortedBy { it.referenceMonth }.forEach { invoice ->
+                statementRepository.save(
+                    StatementEntity(
+                        code = statementRequest.code.toString(),
+                        description = statementRequest.description,
+                        value = statementRequest.value,
+                        type = statementRequest.type,
+                        invoice = invoice
+                    )
+                )
+                invoice.recalculateInvoiceValue(statementRequest.value)
+            }
+        } ?: throw UserNotFoundException("User $userEmail not found")
+    }
+
+    private fun normalizeCreditCardDescription(
+        statementRequest: StatementRequest,
+        index: Int
+    ): String {
+        if (statementRequest.installmentAmount == 1) {
+            return statementRequest.description
+        }
+
+        return statementRequest.description.plus(" ${index + 1}/${statementRequest.installmentAmount}")
     }
 
     private fun InvoiceEntity.recalculateInvoiceValue(statementValue: Long) {

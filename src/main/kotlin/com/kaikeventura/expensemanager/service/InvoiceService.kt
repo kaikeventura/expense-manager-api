@@ -69,4 +69,10 @@ class InvoiceService(
             referenceMonth = referenceMonth,
             limit = Limit.of(limit)
         )
+
+    fun getAllInvoices(user: UserEntity, referenceMonth: YearMonth): List<InvoiceEntity> =
+        invoiceRepository.findAllByUserIdAndReferenceMonthGreaterThanEqual(
+            userId = user.id!!,
+            referenceMonth = referenceMonth
+        )
 }
