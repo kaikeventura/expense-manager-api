@@ -1,5 +1,6 @@
 package com.kaikeventura.expensemanager.configuration
 
+import com.kaikeventura.expensemanager.entity.Role
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationProvider
@@ -24,7 +25,7 @@ class SecurityConfiguration(
         http.csrf { csrf: CsrfConfigurer<HttpSecurity> -> csrf.disable() }
             .authorizeHttpRequests { authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
-//                    .requestMatchers("/api/auth/**").hasRole(Role.USER.name)
+                    .requestMatchers("/invoices/first-invoice").hasRole(Role.ADMIN.name)
                     .requestMatchers("/sign-up", "/sign-on").permitAll()
                     .anyRequest().authenticated()
             }
