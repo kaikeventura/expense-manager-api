@@ -4,6 +4,7 @@ import com.kaikeventura.expensemanager.configuration.TestContainersConfiguration
 import com.kaikeventura.expensemanager.controller.request.RegisterRequest
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
 import com.kaikeventura.expensemanager.entity.StatementType
+import com.kaikeventura.expensemanager.entity.StatementType.CREDIT_CARD
 import com.kaikeventura.expensemanager.entity.StatementType.IN_CASH
 import com.kaikeventura.expensemanager.entity.UserEntity
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
@@ -82,6 +83,62 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             assertEquals("Watter bill", it.description)
             assertEquals(IN_CASH, it.type)
             assertEquals(150_00L, it.value)
+        }
+    }
+
+    @Test
+    fun `it should create a credit card expense with one installment`() {
+        val invoice = invoiceRepository.findAll().single()
+        statementService.createStatement(
+            userEmail = user.email,
+            statementRequest = StatementRequest(
+                description = "Amazon",
+                value = 150_00L,
+                installmentAmount = 1,
+                type = CREDIT_CARD,
+                referenceMonth = invoice.referenceMonth
+            )
+        )
+
+        invoiceRepository.findAll().single { it.user.id == user.id }.let {
+            assertEquals(150_00L, it.totalValue)
+        }
+
+        statementRepository.findAllByInvoiceId(invoice.id!!).single().let {
+            assertEquals("Amazon", it.description)
+            assertEquals(CREDIT_CARD, it.type)
+            assertEquals(150_00L, it.value)
+        }
+    }
+
+    @Test
+    fun `it should create a credit card expense with multiple installments`() {
+        val invoice = invoiceRepository.findAll().single()
+        statementService.createStatement(
+            userEmail = user.email,
+            statementRequest = StatementRequest(
+                description = "Amazon",
+                value = 300_30L,
+                installmentAmount = 3,
+                type = CREDIT_CARD,
+                referenceMonth = invoice.referenceMonth
+            )
+        )
+
+        invoiceRepository.findAll().filter { it.user.id == user.id }.also {
+            assertEquals(it.size, 3)
+        }.forEach {
+            assertEquals(100_10L, it.totalValue)
+        }
+
+        statementRepository.findAllByInvoiceUserId(user.id!!).also {
+            assertEquals(it.size, 3)
+        }.sortedBy {
+            it.createdAt
+        }.forEachIndexed { index, statement ->
+            assertEquals("Amazon ${index + 1}/3", statement.description)
+            assertEquals(CREDIT_CARD, statement.type)
+            assertEquals(100_10, statement.value)
         }
     }
 }

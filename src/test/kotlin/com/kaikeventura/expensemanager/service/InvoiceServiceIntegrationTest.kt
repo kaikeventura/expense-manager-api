@@ -60,7 +60,7 @@ class InvoiceServiceIntegrationTest : TestContainersConfiguration() {
     @Test
     fun `it should create a next invoice for user`() {
         val firstInvoice = invoiceRepository.findAll().first()
-        val futureInvoice = invoiceService.createFutureInvoice(user.id!!)
+        val futureInvoice = invoiceService.createFutureInvoice(user)
 
         val expectedNextReferenceMonth = firstInvoice.referenceMonth.plusMonths(1)
 
