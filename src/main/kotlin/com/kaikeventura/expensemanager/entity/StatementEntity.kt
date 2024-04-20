@@ -12,10 +12,9 @@ data class StatementEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
 
+    val code: String,
     val description: String,
-
     val value: Long,
-
     val type: StatementType,
 
     @ManyToOne

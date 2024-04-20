@@ -46,6 +46,7 @@ class StatementService(
             ).let { invoice ->
                 statementRepository.save(
                     StatementEntity(
+                        code = statementRequest.code.toString(),
                         description = statementRequest.description,
                         value = statementRequest.value,
                         type = statementRequest.type,
