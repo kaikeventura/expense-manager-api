@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
+import java.time.YearMonth
 
 @SpringBootTest
 class StatementServiceIntegrationTest : TestContainersConfiguration() {
@@ -53,7 +54,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 description = "Watter bill",
                 value = 150_00L,
                 type = IN_CASH,
-                referenceMonth = invoice.referenceMonth
+                referenceMonth = YearMonth.parse(invoice.referenceMonth)
             )
         )
 
@@ -81,7 +82,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 description = "Watter bill",
                 value = 100_00L,
                 type = IN_CASH,
-                referenceMonth = invoice.referenceMonth,
+                referenceMonth = YearMonth.parse(invoice.referenceMonth),
                 proportionality = Proportionality(
                     userEmail = userTwo.email,
                     percentage = BigDecimal(70)
@@ -128,7 +129,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 value = 150_00L,
                 installmentAmount = 1,
                 type = CREDIT_CARD,
-                referenceMonth = invoice.referenceMonth
+                referenceMonth = YearMonth.parse(invoice.referenceMonth)
             )
         )
 
@@ -157,7 +158,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 value = 150_00L,
                 installmentAmount = 1,
                 type = CREDIT_CARD,
-                referenceMonth = invoice.referenceMonth,
+                referenceMonth = YearMonth.parse(invoice.referenceMonth),
                 proportionality = Proportionality(
                     userEmail = userTwo.email,
                     percentage = BigDecimal(50)
@@ -203,7 +204,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 value = 300_30L,
                 installmentAmount = 3,
                 type = CREDIT_CARD,
-                referenceMonth = invoice.referenceMonth
+                referenceMonth = YearMonth.parse(invoice.referenceMonth)
             )
         )
 
@@ -238,7 +239,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 value = 300_00L,
                 installmentAmount = 3,
                 type = CREDIT_CARD,
-                referenceMonth = invoice.referenceMonth,
+                referenceMonth = YearMonth.parse(invoice.referenceMonth),
                 proportionality = Proportionality(
                     userEmail = userTwo.email,
                     percentage = BigDecimal(50)
@@ -281,7 +282,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 description = "House financing",
                 value = 2000_00L,
                 type = FIXED,
-                referenceMonth = invoice.referenceMonth
+                referenceMonth = YearMonth.parse(invoice.referenceMonth)
             )
         )
 
@@ -320,7 +321,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 description = "House financing",
                 value = 2000_00L,
                 type = FIXED,
-                referenceMonth = invoice.referenceMonth,
+                referenceMonth = YearMonth.parse(invoice.referenceMonth),
                 proportionality = Proportionality(
                     userEmail = userTwo.email,
                     percentage = BigDecimal(70)
