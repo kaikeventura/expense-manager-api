@@ -65,6 +65,6 @@ class InvoiceServiceIntegrationTest : TestContainersConfiguration() {
 
         val expectedNextReferenceMonth = YearMonth.parse(firstInvoice.referenceMonth).plusMonths(1)
 
-        assertEquals(expectedNextReferenceMonth, futureInvoice.referenceMonth)
+        assertEquals(expectedNextReferenceMonth.toString(), futureInvoice.referenceMonth)
     }
 }
