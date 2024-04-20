@@ -1,5 +1,6 @@
 package com.kaikeventura.expensemanager.error.handler
 
+import com.kaikeventura.expensemanager.error.exception.InvoiceNotFoundException
 import com.kaikeventura.expensemanager.error.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -13,6 +14,11 @@ class ExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserNotFoundException::class)
     fun exception(ex: UserNotFoundException) =
+        ResponseError(ex.message)
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvoiceNotFoundException::class)
+    fun exception(ex: InvoiceNotFoundException) =
         ResponseError(ex.message)
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

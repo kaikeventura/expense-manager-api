@@ -3,6 +3,7 @@ package com.kaikeventura.expensemanager.service
 import com.kaikeventura.expensemanager.common.brazilZoneId
 import com.kaikeventura.expensemanager.entity.InvoiceEntity
 import com.kaikeventura.expensemanager.entity.InvoiceState.*
+import com.kaikeventura.expensemanager.entity.StatementEntity
 import com.kaikeventura.expensemanager.error.exception.InvoiceNotFoundException
 import com.kaikeventura.expensemanager.error.exception.UserNotFoundException
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
@@ -45,4 +46,19 @@ class InvoiceService(
                 )
             } ?: throw InvoiceNotFoundException("Last invoice for user $userId not found")
         } ?: throw  UserNotFoundException("User $userId not found")
+
+    fun getInvoiceByUserIdAndReferenceMonth(userId: String, referenceMonth: YearMonth): InvoiceEntity =
+        invoiceRepository.findByUserIdAndReferenceMonth(userId, referenceMonth)
+            ?: throw InvoiceNotFoundException("Invoice with reference month $referenceMonth for user $userId not found")
+
+    fun updateInvoiceTotalAmount(
+        invoiceEntity: InvoiceEntity,
+        newStatementValue: Long
+    ) {
+        invoiceRepository.save(
+            invoiceEntity.copy(
+                totalValue = invoiceEntity.totalValue.plus(newStatementValue)
+            )
+        )
+    }
 }

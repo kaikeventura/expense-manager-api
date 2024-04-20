@@ -12,9 +12,11 @@ data class StatementEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
 
-    val description: Long,
+    val description: String,
 
     val value: Long,
+
+    val type: StatementType,
 
     @ManyToOne
     @JoinColumn(name = "invoice_id")
@@ -27,3 +29,9 @@ data class StatementEntity(
     @UpdateTimestamp
     val modifiedAt: LocalDateTime? = null
 )
+
+enum class StatementType(description: String) {
+    CREDIT_CARD("Cartão de crédito"),
+    FIXED("Gasto fixo"),
+    IN_CASH("À vista")
+}
