@@ -19,6 +19,28 @@ class StatementService(
     private val statementRepository: StatementRepository
 ) {
 
+    fun createStatementByProportionality(
+        userEmail: String,
+        statementRequest: StatementRequest
+    ) {
+        statementRequest.withProportionality().also { statement ->
+            when (statementRequest.type) {
+                CREDIT_CARD -> createCreditCardStatement(userEmail, statement)
+                FIXED -> createMultipleStatementsForFixedExpense(userEmail, statement)
+                else -> createUniqueStatement(userEmail, statement)
+            }
+        }
+
+        statementRequest.withRemainingProportionality().also { statement ->
+            val otherUserEmail = statement.proportionality!!.userEmail
+            when (statementRequest.type) {
+                CREDIT_CARD -> createCreditCardStatement(otherUserEmail, statement)
+                FIXED -> createMultipleStatementsForFixedExpense(otherUserEmail, statement)
+                else -> createUniqueStatement(otherUserEmail, statement)
+            }
+        }
+    }
+
     fun createStatement(
         userEmail: String,
         statementRequest: StatementRequest
@@ -37,7 +59,6 @@ class StatementService(
         if (statementRequest.installmentAmount == null) {
             createUniqueStatement(userEmail, statementRequest)
         }
-
         createMultipleStatements(userEmail, statementRequest)
     }
 
@@ -122,7 +143,6 @@ class StatementService(
         if (statementRequest.installmentAmount == 1) {
             return statementRequest.description
         }
-
         return statementRequest.description.plus(" ${index + 1}/${statementRequest.installmentAmount}")
     }
 
