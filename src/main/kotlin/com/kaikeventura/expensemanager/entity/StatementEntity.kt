@@ -15,6 +15,8 @@ data class StatementEntity(
     val code: String,
     val description: String,
     val value: Long,
+
+    @Enumerated(EnumType.STRING)
     val type: StatementType,
 
     @ManyToOne

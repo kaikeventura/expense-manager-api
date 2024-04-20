@@ -18,7 +18,8 @@ data class InvoiceEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
 
-    val referenceMonth: YearMonth,
+    @Column(length = 7)
+    val referenceMonth: String,
 
     val totalValue: Long,
 
@@ -26,6 +27,7 @@ data class InvoiceEntity(
     @JoinColumn(name = "user_id")
     val user: UserEntity,
 
+    @Enumerated(EnumType.STRING)
     val state: InvoiceState,
 
     @CreationTimestamp

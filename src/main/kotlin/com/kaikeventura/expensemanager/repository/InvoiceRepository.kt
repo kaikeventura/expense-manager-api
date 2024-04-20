@@ -9,8 +9,8 @@ import java.time.YearMonth
 @Repository
 interface InvoiceRepository : JpaRepository<InvoiceEntity, String> {
     fun findFirstByUserIdOrderByReferenceMonthDesc(userId: String): InvoiceEntity?
-    fun findByUserIdAndReferenceMonth(userId: String, referenceMonth: YearMonth): InvoiceEntity?
-    fun countByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: YearMonth): Int
-    fun findAllByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: YearMonth, limit: Limit): List<InvoiceEntity>
-    fun findAllByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: YearMonth): List<InvoiceEntity>
+    fun findByUserIdAndReferenceMonth(userId: String, referenceMonth: String): InvoiceEntity?
+    fun countByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: String): Int
+    fun findAllByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: String, limit: Limit): List<InvoiceEntity>
+    fun findAllByUserIdAndReferenceMonthGreaterThanEqual(userId: String, referenceMonth: String): List<InvoiceEntity>
 }

@@ -22,7 +22,7 @@ class InvoiceService(
         userRepository.findAll().forEach {
             invoiceRepository.save(
                 InvoiceEntity(
-                    referenceMonth = YearMonth.now(brazilZoneId()),
+                    referenceMonth = YearMonth.now(brazilZoneId()).toString(),
                     totalValue = 0L,
                     state = CURRENT,
                     user = it
@@ -35,7 +35,7 @@ class InvoiceService(
         invoiceRepository.findFirstByUserIdOrderByReferenceMonthDesc(user.id!!)?.let { lastInvoice ->
             invoiceRepository.save(
                 InvoiceEntity(
-                    referenceMonth = lastInvoice.referenceMonth.plusMonths(1),
+                    referenceMonth = YearMonth.parse(lastInvoice.referenceMonth).plusMonths(1).toString(),
                     totalValue = 0L,
                     state = FUTURE,
                     user = user
@@ -44,7 +44,7 @@ class InvoiceService(
         } ?: throw InvoiceNotFoundException("Last invoice for user ${user.id} not found")
 
     fun getInvoiceByUserIdAndReferenceMonth(userId: String, referenceMonth: YearMonth): InvoiceEntity =
-        invoiceRepository.findByUserIdAndReferenceMonth(userId, referenceMonth)
+        invoiceRepository.findByUserIdAndReferenceMonth(userId, referenceMonth.toString())
             ?: throw InvoiceNotFoundException("Invoice with reference month $referenceMonth for user $userId not found")
 
     fun updateInvoice(invoiceEntity: InvoiceEntity) = invoiceRepository.save(invoiceEntity)
@@ -52,7 +52,7 @@ class InvoiceService(
     fun checkInvoicesAmount(user: UserEntity, statementRequest: StatementRequest) {
         invoiceRepository.countByUserIdAndReferenceMonthGreaterThanEqual(
             userId = user.id!!,
-            referenceMonth = statementRequest.referenceMonth
+            referenceMonth = statementRequest.referenceMonth.toString()
         ).let { invoicesAmount ->
             val diff = statementRequest.installmentAmount!! - invoicesAmount
             if (diff > 0) {
@@ -66,13 +66,13 @@ class InvoiceService(
     fun getInvoicesLimitedTo(user: UserEntity, referenceMonth: YearMonth, limit: Int): List<InvoiceEntity> =
         invoiceRepository.findAllByUserIdAndReferenceMonthGreaterThanEqual(
             userId = user.id!!,
-            referenceMonth = referenceMonth,
+            referenceMonth = referenceMonth.toString(),
             limit = Limit.of(limit)
         )
 
     fun getAllInvoices(user: UserEntity, referenceMonth: YearMonth): List<InvoiceEntity> =
         invoiceRepository.findAllByUserIdAndReferenceMonthGreaterThanEqual(
             userId = user.id!!,
-            referenceMonth = referenceMonth
+            referenceMonth = referenceMonth.toString()
         )
 }
