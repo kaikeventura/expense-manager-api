@@ -72,6 +72,7 @@ class StatementService(
                     StatementEntity(
                         code = statementRequest.code.toString(),
                         description = statementRequest.description,
+                        category = statementRequest.category,
                         value = statementRequest.value,
                         type = statementRequest.type,
                         invoice = invoice
@@ -104,6 +105,7 @@ class StatementService(
                     StatementEntity(
                         code = statementRequest.code.toString(),
                         description = normalizeCreditCardDescription(statementRequest, index),
+                        category = statementRequest.category,
                         value = installmentValue,
                         type = statementRequest.type,
                         invoice = invoice
@@ -125,6 +127,7 @@ class StatementService(
                 statementRepository.save(
                     StatementEntity(
                         code = statementRequest.code.toString(),
+                        category = statementRequest.category,
                         description = statementRequest.description,
                         value = statementRequest.value,
                         type = statementRequest.type,

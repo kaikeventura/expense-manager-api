@@ -1,5 +1,6 @@
 package com.kaikeventura.expensemanager.controller.request
 
+import com.kaikeventura.expensemanager.entity.StatementCategory
 import com.kaikeventura.expensemanager.entity.StatementType
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -9,6 +10,7 @@ import java.util.UUID
 data class StatementRequest(
     val code: UUID = UUID.randomUUID(),
     val description: String,
+    val category: StatementCategory,
     val value: Long,
     val installmentAmount: Int? = null,
     val type: StatementType,

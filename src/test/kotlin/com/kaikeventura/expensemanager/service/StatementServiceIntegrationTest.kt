@@ -4,6 +4,9 @@ import com.kaikeventura.expensemanager.configuration.TestContainersConfiguration
 import com.kaikeventura.expensemanager.controller.request.Proportionality
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
 import com.kaikeventura.expensemanager.entity.Role
+import com.kaikeventura.expensemanager.entity.StatementCategory
+import com.kaikeventura.expensemanager.entity.StatementCategory.HOUSING
+import com.kaikeventura.expensemanager.entity.StatementCategory.SHOPPING
 import com.kaikeventura.expensemanager.entity.StatementType.*
 import com.kaikeventura.expensemanager.entity.UserEntity
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
@@ -52,6 +55,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = user.email,
             statementRequest = StatementRequest(
                 description = "Watter bill",
+                category = HOUSING,
                 value = 150_00L,
                 type = IN_CASH,
                 referenceMonth = YearMonth.parse(invoice.referenceMonth)
@@ -80,6 +84,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = userOne.email,
             statementRequest = StatementRequest(
                 description = "Watter bill",
+                category = HOUSING,
                 value = 100_00L,
                 type = IN_CASH,
                 referenceMonth = YearMonth.parse(invoice.referenceMonth),
@@ -126,6 +131,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = user.email,
             statementRequest = StatementRequest(
                 description = "Amazon",
+                category = SHOPPING,
                 value = 150_00L,
                 installmentAmount = 1,
                 type = CREDIT_CARD,
@@ -155,6 +161,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = userOne.email,
             statementRequest = StatementRequest(
                 description = "Amazon",
+                category = SHOPPING,
                 value = 150_00L,
                 installmentAmount = 1,
                 type = CREDIT_CARD,
@@ -201,6 +208,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = user.email,
             statementRequest = StatementRequest(
                 description = "Amazon",
+                category = SHOPPING,
                 value = 300_30L,
                 installmentAmount = 3,
                 type = CREDIT_CARD,
@@ -236,6 +244,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = userOne.email,
             statementRequest = StatementRequest(
                 description = "Amazon",
+                category = SHOPPING,
                 value = 300_00L,
                 installmentAmount = 3,
                 type = CREDIT_CARD,
@@ -280,6 +289,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = user.email,
             statementRequest = StatementRequest(
                 description = "House financing",
+                category = HOUSING,
                 value = 2000_00L,
                 type = FIXED,
                 referenceMonth = YearMonth.parse(invoice.referenceMonth)
@@ -319,6 +329,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
             userEmail = userOne.email,
             statementRequest = StatementRequest(
                 description = "House financing",
+                category = HOUSING,
                 value = 2000_00L,
                 type = FIXED,
                 referenceMonth = YearMonth.parse(invoice.referenceMonth),

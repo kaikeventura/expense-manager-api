@@ -17,6 +17,9 @@ data class StatementEntity(
     val value: Long,
 
     @Enumerated(EnumType.STRING)
+    val category: StatementCategory,
+
+    @Enumerated(EnumType.STRING)
     val type: StatementType,
 
     @ManyToOne
@@ -35,4 +38,25 @@ enum class StatementType(description: String) {
     CREDIT_CARD("Cartão de crédito"),
     FIXED("Gasto fixo"),
     IN_CASH("À vista")
+}
+
+enum class StatementCategory(val description: String) {
+    FOOD("Alimentação"),
+    TRANSPORTATION("Transporte"),
+    ENTERTAINMENT("Entretenimento"),
+    HEALTH("Saúde"),
+    UTILITIES("Serviços públicos"),
+    EDUCATION("Educação"),
+    SHOPPING("Compras"),
+    HOUSING("Moradia"),
+    TRAVEL("Viagem"),
+    PERSONAL_CARE("Cuidados pessoais"),
+    GIFTS("Presentes"),
+    OTHER("Outros");
+
+    companion object {
+        fun getByDescription(description: String): StatementCategory? {
+            return entries.find { it.description.equals(description, ignoreCase = true) }
+        }
+    }
 }
