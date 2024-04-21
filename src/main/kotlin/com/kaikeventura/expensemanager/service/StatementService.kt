@@ -24,20 +24,12 @@ class StatementService(
         statementRequest: StatementRequest
     ) {
         statementRequest.withProportionality().also { statement ->
-            when (statementRequest.type) {
-                CREDIT_CARD -> createCreditCardStatement(userEmail, statement)
-                FIXED -> createMultipleStatementsForFixedExpense(userEmail, statement)
-                else -> createUniqueStatement(userEmail, statement)
-            }
+            createStatement(userEmail, statement)
         }
 
         statementRequest.withRemainingProportionality().also { statement ->
             val otherUserEmail = statement.proportionality!!.userEmail
-            when (statementRequest.type) {
-                CREDIT_CARD -> createCreditCardStatement(otherUserEmail, statement)
-                FIXED -> createMultipleStatementsForFixedExpense(otherUserEmail, statement)
-                else -> createUniqueStatement(otherUserEmail, statement)
-            }
+            createStatement(otherUserEmail, statement)
         }
     }
 
