@@ -34,7 +34,7 @@ data class StatementEntity(
     val modifiedAt: LocalDateTime? = null
 )
 
-enum class StatementType(description: String) {
+enum class StatementType(val description: String) {
     CREDIT_CARD("Cartão de crédito"),
     FIXED("Gasto fixo"),
     IN_CASH("À vista")
