@@ -2,11 +2,15 @@ package com.kaikeventura.expensemanager.service
 
 import com.kaikeventura.expensemanager.common.brazilZoneId
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
+import com.kaikeventura.expensemanager.controller.response.InvoiceResponse
+import com.kaikeventura.expensemanager.controller.response.InvoiceWithReferencesResponse
+import com.kaikeventura.expensemanager.controller.response.StatementResponse
 import com.kaikeventura.expensemanager.entity.InvoiceEntity
 import com.kaikeventura.expensemanager.entity.InvoiceState.*
 import com.kaikeventura.expensemanager.entity.UserEntity
 import com.kaikeventura.expensemanager.error.exception.InvoiceNotFoundException
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
+import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
 import org.springframework.data.domain.Limit
 import org.springframework.stereotype.Service
@@ -15,7 +19,8 @@ import java.time.YearMonth
 @Service
 class InvoiceService(
     private val userRepository: UserRepository,
-    private val invoiceRepository: InvoiceRepository
+    private val invoiceRepository: InvoiceRepository,
+    private val statementRepository: StatementRepository
 ) {
 
     fun createFirstInvoiceForAllUsers() {
@@ -30,6 +35,32 @@ class InvoiceService(
             )
         }
     }
+
+    fun getInvoiceWithReferences(userEmail: String): List<InvoiceWithReferencesResponse> =
+        invoiceRepository.findAllByUserEmail(userEmail).map {
+            InvoiceWithReferencesResponse(
+                referenceMonth = YearMonth.parse(it.referenceMonth),
+                state = it.state
+            )
+        }.sortedBy { it.referenceMonth }
+
+    fun getInvoiceByReferenceMonth(userEmail: String, referenceMonth: YearMonth): InvoiceResponse =
+        invoiceRepository.findByUserEmailAndReferenceMonth(userEmail, referenceMonth.toString())?.let { invoice ->
+            InvoiceResponse(
+                referenceMonth = YearMonth.parse(invoice.referenceMonth),
+                state = invoice.state,
+                totalValue = invoice.totalValue,
+                statements = statementRepository.findAllByInvoiceId(invoice.id!!).map { statement ->
+                    StatementResponse(
+                        code = statement.code,
+                        description = statement.description,
+                        value = statement.value,
+                        type = statement.type,
+                        createdAt = statement.createdAt!!
+                    )
+                }
+            )
+        } ?: throw InvoiceNotFoundException("Last invoice for user $userEmail and reference month $referenceMonth not found")
 
     fun createFutureInvoice(user: UserEntity): InvoiceEntity =
         invoiceRepository.findFirstByUserIdOrderByReferenceMonthDesc(user.id!!)?.let { lastInvoice ->
