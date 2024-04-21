@@ -54,6 +54,7 @@ class InvoiceService(
                     StatementResponse(
                         code = statement.code,
                         description = statement.description,
+                        category = statement.category,
                         value = statement.value,
                         type = statement.type,
                         createdAt = statement.createdAt!!

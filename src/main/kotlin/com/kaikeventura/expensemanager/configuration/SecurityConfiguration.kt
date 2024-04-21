@@ -25,7 +25,7 @@ class SecurityConfiguration(
         http.csrf { csrf: CsrfConfigurer<HttpSecurity> -> csrf.disable() }
             .authorizeHttpRequests { authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
-                    .requestMatchers("/invoices/first").hasRole(Role.ADMIN.name)
+//                    .requestMatchers("/invoices/first").hasRole(Role.ADMIN.name)
                     .requestMatchers("/sign-up", "/sign-on").permitAll()
                     .anyRequest().authenticated()
             }
