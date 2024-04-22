@@ -39,15 +39,15 @@ class InvoiceService(
     fun getInvoiceWithReferences(userEmail: String): List<InvoiceWithReferencesResponse> =
         invoiceRepository.findAllByUserEmail(userEmail).map {
             InvoiceWithReferencesResponse(
-                referenceMonth = YearMonth.parse(it.referenceMonth),
+                referenceMonth = it.referenceMonth,
                 state = it.state
             )
-        }.sortedBy { it.referenceMonth }
+        }.sortedBy { YearMonth.parse(it.referenceMonth) }
 
     fun getInvoiceByReferenceMonth(userEmail: String, referenceMonth: YearMonth): InvoiceResponse =
         invoiceRepository.findByUserEmailAndReferenceMonth(userEmail, referenceMonth.toString())?.let { invoice ->
             InvoiceResponse(
-                referenceMonth = YearMonth.parse(invoice.referenceMonth),
+                referenceMonth = invoice.referenceMonth,
                 state = invoice.state,
                 totalValue = invoice.totalValue,
                 statements = statementRepository.findAllByInvoiceId(invoice.id!!).map { statement ->
@@ -57,7 +57,7 @@ class InvoiceService(
                         category = statement.category,
                         value = statement.value,
                         type = statement.type,
-                        createdAt = statement.createdAt!!
+                        createdAt = statement.createdAt!!.toString()
                     )
                 }
             )

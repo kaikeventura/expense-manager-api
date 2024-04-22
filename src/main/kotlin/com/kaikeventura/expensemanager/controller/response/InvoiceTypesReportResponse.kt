@@ -2,10 +2,9 @@ package com.kaikeventura.expensemanager.controller.response
 
 import com.kaikeventura.expensemanager.entity.InvoiceState
 import com.kaikeventura.expensemanager.entity.StatementType
-import java.time.YearMonth
 
 data class InvoiceTypesReportResponse(
-    val referenceMonth: YearMonth,
+    val referenceMonth: String,
     val totalValue: Long,
     val state: InvoiceState,
     val types: List<StatementTypesReportResponse>

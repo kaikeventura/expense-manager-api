@@ -3,11 +3,9 @@ package com.kaikeventura.expensemanager.controller.response
 import com.kaikeventura.expensemanager.entity.InvoiceState
 import com.kaikeventura.expensemanager.entity.StatementCategory
 import com.kaikeventura.expensemanager.entity.StatementType
-import java.time.LocalDateTime
-import java.time.YearMonth
 
 data class InvoiceResponse(
-    val referenceMonth: YearMonth,
+    val referenceMonth: String,
     val totalValue: Long,
     val state: InvoiceState,
     val statements: List<StatementResponse>
@@ -19,5 +17,5 @@ data class StatementResponse(
     val category: StatementCategory,
     val value: Long,
     val type: StatementType,
-    val createdAt: LocalDateTime
+    val createdAt: String
 )

@@ -18,7 +18,7 @@ class ReportService(
     fun getInvoiceCategoriesReportByReferenceMonth(userEmail: String, referenceMonth: YearMonth): InvoiceCategoriesReportResponse =
         invoiceRepository.findByUserEmailAndReferenceMonth(userEmail, referenceMonth.toString())?.let { invoice ->
             InvoiceCategoriesReportResponse(
-                referenceMonth = YearMonth.parse(invoice.referenceMonth),
+                referenceMonth = invoice.referenceMonth,
                 totalValue = invoice.totalValue,
                 state = invoice.state,
                 statements = statementRepository.findAllByInvoiceId(invoice.id!!)
@@ -36,7 +36,7 @@ class ReportService(
     fun getInvoiceTypesReportByReferenceMonth(userEmail: String, referenceMonth: YearMonth): InvoiceTypesReportResponse =
         invoiceRepository.findByUserEmailAndReferenceMonth(userEmail, referenceMonth.toString())?.let { invoice ->
             InvoiceTypesReportResponse(
-                referenceMonth = YearMonth.parse(invoice.referenceMonth),
+                referenceMonth = invoice.referenceMonth,
                 totalValue = invoice.totalValue,
                 state = invoice.state,
                 types = statementRepository.findAllByInvoiceId(invoice.id!!)
