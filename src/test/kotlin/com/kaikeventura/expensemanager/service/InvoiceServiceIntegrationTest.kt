@@ -53,7 +53,10 @@ class InvoiceServiceIntegrationTest : TestContainersConfiguration() {
 
     @Test
     fun `it should create a first invoice for all users`() {
-        invoiceRepository.findAll().first().let {
+        repeat(3) {
+            invoiceService.createFirstInvoiceForAllUsers()
+        }
+        invoiceRepository.findAll().single().let {
             assertEquals(user.id, it.user.id)
         }
     }

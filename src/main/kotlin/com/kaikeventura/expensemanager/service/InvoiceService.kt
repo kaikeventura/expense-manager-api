@@ -24,7 +24,7 @@ class InvoiceService(
 ) {
 
     fun createFirstInvoiceForAllUsers() {
-        userRepository.findAll().forEach {
+        userRepository.findAllWithoutInvoice().forEach {
             invoiceRepository.save(
                 InvoiceEntity(
                     referenceMonth = YearMonth.now(brazilZoneId()).toString(),
