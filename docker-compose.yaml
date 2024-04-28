@@ -9,6 +9,7 @@ services:
       - "8080:8080"
     environment:
       - DATABASE_HOST=expense-manager-mysql
+      - JTW_SECRET=ThisIsSecretForJWTHS512SignatureAlgorithmThatMUSTHave64ByteLength
 
   mysql:
     image: mysql

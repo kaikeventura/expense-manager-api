@@ -10,4 +10,4 @@ spring:
 
 jwt:
   expiration: 3600000
-  secret: ThisIsSecretForJWTHS512SignatureAlgorithmThatMUSTHave64ByteLength
+  secret: ${JTW_SECRET:ThisIsSecretForJWTHS512SignatureAlgorithmThatMUSTHave64ByteLength}
