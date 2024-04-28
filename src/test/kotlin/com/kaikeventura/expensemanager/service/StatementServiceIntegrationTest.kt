@@ -123,7 +123,7 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
 
     @Test
     fun `it should create a credit card expense with one installment`() {
-        val user = anUser("anytwouser@gmail.com")
+        val user = anUser("tututubarao@gmail.com")
         invoiceService.createFirstInvoiceForAllUsers()
 
         val invoice = invoiceRepository.findAll().single()
