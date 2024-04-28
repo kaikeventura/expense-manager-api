@@ -3,8 +3,9 @@ package com.kaikeventura.expensemanager.service
 import com.kaikeventura.expensemanager.configuration.TestContainersConfiguration
 import com.kaikeventura.expensemanager.controller.request.Proportionality
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
+import com.kaikeventura.expensemanager.entity.InvoiceState.CURRENT
+import com.kaikeventura.expensemanager.entity.InvoiceState.FUTURE
 import com.kaikeventura.expensemanager.entity.Role
-import com.kaikeventura.expensemanager.entity.StatementCategory
 import com.kaikeventura.expensemanager.entity.StatementCategory.HOUSING
 import com.kaikeventura.expensemanager.entity.StatementCategory.SHOPPING
 import com.kaikeventura.expensemanager.entity.StatementType.*
@@ -13,7 +14,7 @@ import com.kaikeventura.expensemanager.repository.InvoiceRepository
 import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -373,6 +374,77 @@ class StatementServiceIntegrationTest : TestContainersConfiguration() {
                 assertEquals("House financing", statement.description)
                 assertEquals(FIXED, statement.type)
                 assertEquals(600_00L, statement.value)
+            }
+        }
+    }
+
+    @Test
+    fun `it should create a fixed expenses in new future invoices`() {
+        val user = anUser("anyfouruser@gmail.com")
+        invoiceService.createFirstInvoiceForAllUsers()
+
+        val invoice = invoiceRepository.findByUserIdAndState(
+            userId = user.id!!, state = CURRENT
+        )!!
+
+        statementService.createStatement(
+            userEmail = user.email,
+            statementRequest = StatementRequest(
+                description = "House financing",
+                category = HOUSING,
+                value = 2000_00L,
+                type = FIXED,
+                referenceMonth = YearMonth.parse(invoice.referenceMonth)
+            )
+        )
+
+        statementService.createStatement(
+            userEmail = user.email,
+            statementRequest = StatementRequest(
+                description = "Amazon",
+                category = SHOPPING,
+                value = 2000_00L,
+                type = CREDIT_CARD,
+                installmentAmount = 4,
+                referenceMonth = YearMonth.parse(invoice.referenceMonth)
+            )
+        )
+
+        val invoices = invoiceRepository.findAllByUserId(user.id!!)
+
+        with(invoices.single { it.state == CURRENT }) {
+            assertEquals(2500_00L, totalValue)
+
+            with(statementRepository.findAllByInvoiceId(id!!)) {
+                assertEquals(2, size)
+
+                with(single { it.type == FIXED }) {
+                    assertEquals(2000_00L, value)
+                    assertEquals(HOUSING, category)
+                }
+                with(single { it.type == CREDIT_CARD }) {
+                    assertEquals(500_00L, value)
+                    assertEquals(SHOPPING, category)
+                }
+            }
+        }
+
+        with(invoices.filter { it.state == FUTURE }) {
+            assertEquals(3, size)
+
+            forEach { futureInvoice ->
+                with(statementRepository.findAllByInvoiceId(futureInvoice.id!!)) {
+                    assertEquals(2, size)
+
+                    with(single { it.type == FIXED }) {
+                        assertEquals(2000_00L, value)
+                        assertEquals(HOUSING, category)
+                    }
+                    with(single { it.type == CREDIT_CARD }) {
+                        assertEquals(500_00L, value)
+                        assertEquals(SHOPPING, category)
+                    }
+                }
             }
         }
     }
