@@ -1,7 +1,6 @@
 package com.kaikeventura.expensemanager.controller
 
 import com.kaikeventura.expensemanager.configuration.JwtService
-import com.kaikeventura.expensemanager.controller.request.StatementRequest
 import com.kaikeventura.expensemanager.service.InvoiceService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
