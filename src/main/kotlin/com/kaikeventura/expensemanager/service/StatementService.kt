@@ -48,7 +48,7 @@ class StatementService(
         userEmail: String,
         statementRequest: StatementRequest
     ) {
-        if (statementRequest.installmentAmount == null) {
+        if (statementRequest.installmentAmount == null || statementRequest.installmentAmount == 1) {
             createUniqueStatement(userEmail, statementRequest)
         }
         createMultipleStatements(userEmail, statementRequest)
