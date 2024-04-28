@@ -143,7 +143,7 @@ class StatementService(
 
     private fun InvoiceEntity.recalculateInvoiceValue(statementValue: Long) {
         invoiceService.updateInvoice(
-            invoiceEntity = this.copy(
+            invoice = this.copy(
                 totalValue = this.totalValue.plus(statementValue)
             )
         )

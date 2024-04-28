@@ -1,6 +1,7 @@
 package com.kaikeventura.expensemanager.service
 
 import com.kaikeventura.expensemanager.common.brazilZoneId
+import com.kaikeventura.expensemanager.common.toYearMonth
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
 import com.kaikeventura.expensemanager.controller.response.InvoiceResponse
 import com.kaikeventura.expensemanager.controller.response.InvoiceWithReferencesResponse
@@ -79,7 +80,7 @@ class InvoiceService(
         invoiceRepository.findByUserIdAndReferenceMonth(userId, referenceMonth.toString())
             ?: throw InvoiceNotFoundException("Invoice with reference month $referenceMonth for user $userId not found")
 
-    fun updateInvoice(invoiceEntity: InvoiceEntity) = invoiceRepository.save(invoiceEntity)
+    fun updateInvoice(invoice: InvoiceEntity) = invoiceRepository.save(invoice)
 
     fun checkInvoicesAmount(user: UserEntity, statementRequest: StatementRequest) {
         invoiceRepository.countByUserIdAndReferenceMonthGreaterThanEqual(
@@ -107,4 +108,51 @@ class InvoiceService(
             userId = user.id!!,
             referenceMonth = referenceMonth.toString()
         )
+
+    fun handleInvoiceCycles() {
+        val currentYearMonth = YearMonth.now(brazilZoneId())
+
+        invoiceRepository.findAllByState(CURRENT).forEach { invoice ->
+            with(invoice) {
+                if (referenceMonth.toYearMonth() < currentYearMonth) {
+                    handleInvoiceCycle(currentYearMonth)
+                }
+            }
+        }
+    }
+
+    private fun InvoiceEntity.handleInvoiceCycle(currentYearMonth: YearMonth) {
+        updateInvoice(
+            invoice = this.copy(state = PREVIOUS)
+        )
+        getNextInvoice()?.let { nextInvoice ->
+            updateInvoice(
+                invoice = nextInvoice.copy(state = CURRENT)
+            )
+        } ?: createNewCurrentInvoice(
+            currentYearMonth = currentYearMonth,
+            user = this.user
+        ).let {
+            // fixedStatements
+        }
+    }
+
+    private fun InvoiceEntity.getNextInvoice() =
+        invoiceRepository.findByUserIdAndReferenceMonthAndState(
+            userId = this.user.id!!,
+            referenceMonth = this.referenceMonth.toYearMonth().plusMonths(1).toString(),
+            state = FUTURE
+        )
+
+    private fun createNewCurrentInvoice(
+        currentYearMonth: YearMonth,
+        user: UserEntity
+    ) = invoiceRepository.save(
+        InvoiceEntity(
+            referenceMonth = currentYearMonth.toString(),
+            totalValue = 0L,
+            state = CURRENT,
+            user = user
+        )
+    )
 }
