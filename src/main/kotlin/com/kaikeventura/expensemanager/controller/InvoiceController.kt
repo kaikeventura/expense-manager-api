@@ -36,4 +36,8 @@ class InvoiceController(
         userEmail = jwtService.extractUsername(token.substring(7)),
         referenceMonth = referenceMonth
     )
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/cycles")
+    fun getInvoiceByYearMonth() = invoiceService.handleInvoiceCycles()
 }

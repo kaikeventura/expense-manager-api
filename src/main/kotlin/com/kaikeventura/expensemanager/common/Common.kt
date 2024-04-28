@@ -5,4 +5,4 @@ import java.time.ZoneId
 
 fun brazilZoneId(): ZoneId = ZoneId.of("America/Sao_Paulo")
 
-fun String.toYearMonth() = YearMonth.parse(this)
+fun String.toYearMonth(): YearMonth = YearMonth.parse(this)
