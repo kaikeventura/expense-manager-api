@@ -6,12 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
 @Entity
-@Table(
-    name = "invoices",
-    uniqueConstraints = [
-        UniqueConstraint(columnNames = ["user", "referenceMonth"])
-    ]
-)
+@Table(name = "invoices")
 data class InvoiceEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

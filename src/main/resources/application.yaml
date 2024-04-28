@@ -1,12 +1,21 @@
 spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
+    generate-ddl: false
   datasource:
     url: jdbc:mysql://${DATABASE_HOST:localhost}:3306/db?createDatabaseIfNotExist=true
-    username: root
-    password: root
+    username: ${DATABASE_USER:root}
+    password: ${DATABASE_PASSWORD:root}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    dialect: org.hibernate.dialect.MySQL8Dialect
+    hikari:
+      maximum-pool-size: ${HIKARI_POOL_SIZE:2}
+
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    validateOnMigrate: true
+    locations: classpath:db/migration
 
 jwt:
   expiration: 3600000
