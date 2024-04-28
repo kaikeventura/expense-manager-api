@@ -10,7 +10,8 @@ services:
     environment:
       - DATABASE_HOST=expense-manager-mysql
       - DATABASE_USER=root
-      - DATABASE_PASSWORD:root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=expense_manager
       - HIKARI_POOL_SIZE=2
       - JTW_SECRET=ThisIsSecretForJWTHS512SignatureAlgorithmThatMUSTHave64ByteLength
 
@@ -20,6 +21,6 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db
+      MYSQL_DATABASE: expense_manager
     ports:
       - "3306:3306"

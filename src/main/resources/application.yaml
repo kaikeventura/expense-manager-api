@@ -3,7 +3,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     generate-ddl: false
   datasource:
-    url: jdbc:mysql://${DATABASE_HOST:localhost}:3306/db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://${DATABASE_HOST:localhost}:3306/${DATABASE_NAME:expense_manager}?createDatabaseIfNotExist=true
     username: ${DATABASE_USER:root}
     password: ${DATABASE_PASSWORD:root}
     driverClassName: com.mysql.cj.jdbc.Driver
