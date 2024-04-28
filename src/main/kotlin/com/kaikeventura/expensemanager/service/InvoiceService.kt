@@ -8,6 +8,8 @@ import com.kaikeventura.expensemanager.controller.response.InvoiceWithReferences
 import com.kaikeventura.expensemanager.controller.response.StatementResponse
 import com.kaikeventura.expensemanager.entity.InvoiceEntity
 import com.kaikeventura.expensemanager.entity.InvoiceState.*
+import com.kaikeventura.expensemanager.entity.StatementEntity
+import com.kaikeventura.expensemanager.entity.StatementType.FIXED
 import com.kaikeventura.expensemanager.entity.UserEntity
 import com.kaikeventura.expensemanager.error.exception.InvoiceNotFoundException
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
@@ -132,8 +134,27 @@ class InvoiceService(
         } ?: createNewCurrentInvoice(
             currentYearMonth = currentYearMonth,
             user = this.user
-        ).let {
-            // fixedStatements
+        ).let { newCurrentInvoice ->
+            moveFixedStatementsToNewCurrentInvoice(newCurrentInvoice)
+        }
+    }
+
+    private fun InvoiceEntity.moveFixedStatementsToNewCurrentInvoice(newCurrentInvoice: InvoiceEntity) {
+        statementRepository.findAllByInvoiceIdAndType(
+            invoiceId = id!!,
+            type = FIXED
+        ).map { statement ->
+            StatementEntity(
+                code = statement.code,
+                category = statement.category,
+                description = statement.description,
+                value = statement.value,
+                type = statement.type,
+                invoice = newCurrentInvoice
+            )
+        }.let { newStatements ->
+            statementRepository.saveAll(newStatements)
+            updateInvoice(invoice = newCurrentInvoice.copy(totalValue = newStatements.sumOf { it.value }))
         }
     }
 
