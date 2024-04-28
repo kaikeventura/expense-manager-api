@@ -9,5 +9,5 @@ spring:
     password: root
 
 jwt:
-  expiration: 60000
+  expiration: 3600000
   secret: ThisIsSecretForJWTHS512SignatureAlgorithmThatMUSTHave64ByteLength
