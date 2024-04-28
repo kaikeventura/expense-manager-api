@@ -19,4 +19,5 @@ interface InvoiceRepository : JpaRepository<InvoiceEntity, String> {
     fun findAllByState(state: InvoiceState): List<InvoiceEntity>
     fun findAllByUserId(userId: String): List<InvoiceEntity>
     fun findByUserIdAndReferenceMonthAndState(userId: String, referenceMonth: String, state: InvoiceState): InvoiceEntity?
+    fun findByUserIdAndState(userId: String, state: InvoiceState): InvoiceEntity?
 }

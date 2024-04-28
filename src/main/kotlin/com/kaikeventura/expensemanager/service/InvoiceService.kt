@@ -91,9 +91,7 @@ class InvoiceService(
         ).let { invoicesAmount ->
             val diff = statementRequest.installmentAmount!! - invoicesAmount
             if (diff > 0) {
-                (1..diff).forEach { _ ->
-                    createFutureInvoice(user)
-                }
+                handleFutureInvoices(user, diff)
             }
         }
     }
@@ -135,11 +133,26 @@ class InvoiceService(
             currentYearMonth = currentYearMonth,
             user = this.user
         ).let { newCurrentInvoice ->
-            moveFixedStatementsToNewCurrentInvoice(newCurrentInvoice)
+            createFixedStatementsToTargetInvoice(newCurrentInvoice)
         }
     }
 
-    private fun InvoiceEntity.moveFixedStatementsToNewCurrentInvoice(newCurrentInvoice: InvoiceEntity) {
+    private fun handleFutureInvoices(user: UserEntity, diff: Int) {
+        val currentInvoice = invoiceRepository.findByUserIdAndState(
+            userId = user.id!!,
+            state = CURRENT
+        ) ?: throw InvoiceNotFoundException("Current invoice for user ${user.id} not found")
+
+        (1..diff).forEach { _ ->
+            createFutureInvoice(user).let { newFutureInvoice ->
+                currentInvoice.createFixedStatementsToTargetInvoice(
+                    targetInvoice = newFutureInvoice
+                )
+            }
+        }
+    }
+
+    private fun InvoiceEntity.createFixedStatementsToTargetInvoice(targetInvoice: InvoiceEntity) {
         statementRepository.findAllByInvoiceIdAndType(
             invoiceId = id!!,
             type = FIXED
@@ -150,11 +163,11 @@ class InvoiceService(
                 description = statement.description,
                 value = statement.value,
                 type = statement.type,
-                invoice = newCurrentInvoice
+                invoice = targetInvoice
             )
         }.let { newStatements ->
             statementRepository.saveAll(newStatements)
-            updateInvoice(invoice = newCurrentInvoice.copy(totalValue = newStatements.sumOf { it.value }))
+            updateInvoice(invoice = targetInvoice.copy(totalValue = newStatements.sumOf { it.value }))
         }
     }
 
