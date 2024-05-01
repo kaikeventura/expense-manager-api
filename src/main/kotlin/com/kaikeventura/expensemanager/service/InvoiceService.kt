@@ -15,7 +15,6 @@ import com.kaikeventura.expensemanager.error.exception.InvoiceNotFoundException
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
 import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
-import org.springframework.data.domain.Limit
 import org.springframework.stereotype.Service
 import java.time.YearMonth
 
@@ -97,10 +96,10 @@ class InvoiceService(
     }
 
     fun getInvoicesLimitedTo(user: UserEntity, referenceMonth: YearMonth, limit: Int): List<InvoiceEntity> =
-        invoiceRepository.findAllByUserIdAndReferenceMonthGreaterThanEqual(
+        invoiceRepository.findAllByUserIdAndReferenceMonthGreaterThanEqualLimitedTo(
             userId = user.id!!,
             referenceMonth = referenceMonth.toString(),
-            limit = Limit.of(limit)
+            limit = limit
         )
 
     fun getAllInvoices(user: UserEntity, referenceMonth: YearMonth): List<InvoiceEntity> =
