@@ -5,6 +5,7 @@ import com.kaikeventura.expensemanager.service.InvoiceService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.time.YearMonth
+import java.util.UUID
 
 @RestController
 @RequestMapping("/invoices")
@@ -39,4 +40,9 @@ class InvoiceController(
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/cycles")
     fun getInvoiceByYearMonth() = invoiceService.handleInvoiceCycles()
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PutMapping("/{invoiceId}/recalculate-total-amount")
+    fun recalculateTotalValue(@PathVariable invoiceId: UUID) =
+        invoiceService.recalculateTotalValue(invoiceId = invoiceId)
 }

@@ -15,8 +15,10 @@ import com.kaikeventura.expensemanager.error.exception.InvoiceNotFoundException
 import com.kaikeventura.expensemanager.repository.InvoiceRepository
 import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.YearMonth
+import java.util.UUID
 
 @Service
 class InvoiceService(
@@ -64,6 +66,16 @@ class InvoiceService(
                 }
             )
         } ?: throw InvoiceNotFoundException("Last invoice for user $userEmail and reference month $referenceMonth not found")
+
+    fun recalculateTotalValue(invoiceId: UUID) {
+        invoiceRepository.findByIdOrNull(invoiceId.toString())?.let { invoice ->
+            updateInvoice(
+                invoice = invoice.copy(
+                    totalValue = invoice.sumStatementValues()
+                )
+            )
+        } ?: throw InvoiceNotFoundException("Invoice $invoiceId not found")
+    }
 
     fun createFutureInvoice(user: UserEntity): InvoiceEntity =
         invoiceRepository.findFirstByUserIdOrderByReferenceMonthDesc(user.id!!)?.let { lastInvoice ->
@@ -188,4 +200,7 @@ class InvoiceService(
             user = user
         )
     )
+
+    private fun InvoiceEntity.sumStatementValues() =
+        statementRepository.findAllByInvoiceId(id!!).sumOf { it.value }
 }
