@@ -1,17 +1,13 @@
 package com.kaikeventura.expensemanager.service
 
-import com.kaikeventura.expensemanager.configuration.JwtService
 import com.kaikeventura.expensemanager.controller.response.UserDetailsResponse
 import com.kaikeventura.expensemanager.error.exception.UserNotFoundException
 import com.kaikeventura.expensemanager.repository.UserRepository
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
-    private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JwtService,
+    private val userRepository: UserRepository
 ) {
 
     fun getUserDetails(userEmail: String): UserDetailsResponse =
