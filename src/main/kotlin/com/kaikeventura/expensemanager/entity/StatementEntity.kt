@@ -44,6 +44,9 @@ enum class StatementCategory(val description: String) {
     FOOD("Alimentação"),
     TRANSPORTATION("Transporte"),
     ENTERTAINMENT("Entretenimento"),
+    STREAMING("Streaming"),
+    ELECTRONICS("Eletrônicos"),
+    GAMES("Jogos"),
     HEALTH("Saúde"),
     UTILITIES("Serviços públicos"),
     EDUCATION("Educação"),
@@ -52,6 +55,7 @@ enum class StatementCategory(val description: String) {
     TRAVEL("Viagem"),
     PERSONAL_CARE("Cuidados pessoais"),
     GIFTS("Presentes"),
+    BULLSHIT("Besteirinhas"),
     OTHER("Outros");
 
     companion object {
