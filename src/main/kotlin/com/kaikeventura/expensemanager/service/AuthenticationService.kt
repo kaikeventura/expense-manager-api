@@ -59,4 +59,12 @@ class AuthenticationService(
                 email = it.email
             )
         } ?: throw UserNotFoundException("User $userEmail not found")
+
+    fun getOtherUsers(userEmail: String): List<UserDetailsResponse> =
+        userRepository.findAllByEmailNot(userEmail).map {
+            UserDetailsResponse(
+                name = it.name,
+                email = it.email
+            )
+        }
 }

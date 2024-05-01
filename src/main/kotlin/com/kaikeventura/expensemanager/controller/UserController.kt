@@ -24,10 +24,18 @@ class UserController(
         ResponseEntity.ok(authenticationService.login(request))
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/user/details")
-    fun getInvoiceByYearMonth(
+    @GetMapping("/users/details")
+    fun getUserDetails(
         @RequestHeader("Authorization") token: String
     ) = authenticationService.getUserDetails(
+        userEmail = jwtService.extractUsername(token.substring(7))
+    )
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/users/others")
+    fun getOthersUsers(
+        @RequestHeader("Authorization") token: String
+    ) = authenticationService.getOtherUsers(
         userEmail = jwtService.extractUsername(token.substring(7))
     )
 }
