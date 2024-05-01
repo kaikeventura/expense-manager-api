@@ -4,7 +4,6 @@ import com.kaikeventura.expensemanager.configuration.JwtService
 import com.kaikeventura.expensemanager.controller.request.AuthenticationRequest
 import com.kaikeventura.expensemanager.controller.request.RegisterRequest
 import com.kaikeventura.expensemanager.controller.response.AuthenticationResponse
-import com.kaikeventura.expensemanager.controller.response.UserDetailsResponse
 import com.kaikeventura.expensemanager.entity.Role
 import com.kaikeventura.expensemanager.entity.UserEntity
 import com.kaikeventura.expensemanager.error.exception.UserNotFoundException
@@ -51,20 +50,4 @@ class AuthenticationService(
             token = jwtService.generateToken(user)
         )
     }
-
-    fun getUserDetails(userEmail: String): UserDetailsResponse =
-        userRepository.findByEmail(userEmail)?.let {
-            UserDetailsResponse(
-                name = it.name,
-                email = it.email
-            )
-        } ?: throw UserNotFoundException("User $userEmail not found")
-
-    fun getOtherUsers(userEmail: String): List<UserDetailsResponse> =
-        userRepository.findAllByEmailNot(userEmail).map {
-            UserDetailsResponse(
-                name = it.name,
-                email = it.email
-            )
-        }
 }

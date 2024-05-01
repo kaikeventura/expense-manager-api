@@ -22,20 +22,4 @@ class AuthenticationController(
     @PostMapping("/sign-on")
     fun signOn(@RequestBody request: AuthenticationRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok(authenticationService.login(request))
-
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/users/details")
-    fun getUserDetails(
-        @RequestHeader("Authorization") token: String
-    ) = authenticationService.getUserDetails(
-        userEmail = jwtService.extractUsername(token.substring(7))
-    )
-
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/users/others")
-    fun getOthersUsers(
-        @RequestHeader("Authorization") token: String
-    ) = authenticationService.getOtherUsers(
-        userEmail = jwtService.extractUsername(token.substring(7))
-    )
 }
