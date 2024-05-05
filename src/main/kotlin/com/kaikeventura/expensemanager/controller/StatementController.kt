@@ -7,12 +7,15 @@ import com.kaikeventura.expensemanager.entity.StatementType
 import com.kaikeventura.expensemanager.service.StatementService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/statements")
@@ -28,6 +31,18 @@ class StatementController(
         @RequestBody statementRequest: StatementRequest
     ) = statementService.createStatement(
         userEmail = jwtService.extractUsername(token.substring(7)),
+        statementRequest = statementRequest
+    )
+
+    @PatchMapping("{}")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun updateStatement(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable("statementCode") statementCode: UUID,
+        @RequestBody statementRequest: StatementRequest
+    ) = statementService.updateStatement(
+        userEmail = jwtService.extractUsername(token.substring(7)),
+        statementCode = statementCode,
         statementRequest = statementRequest
     )
 

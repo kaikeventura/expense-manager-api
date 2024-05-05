@@ -8,4 +8,5 @@ interface StatementRepository : JpaRepository<StatementEntity, String> {
     fun findAllByInvoiceId(invoiceId: String): List<StatementEntity>
     fun findAllByInvoiceIdAndType(invoiceId: String, type: StatementType): List<StatementEntity>
     fun findAllByInvoiceUserId(userId: String): List<StatementEntity>
+    fun findByCodeAndInvoiceId(code: String, invoiceId: String): StatementEntity?
 }

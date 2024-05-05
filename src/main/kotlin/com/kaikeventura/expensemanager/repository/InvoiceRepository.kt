@@ -2,10 +2,12 @@ package com.kaikeventura.expensemanager.repository
 
 import com.kaikeventura.expensemanager.entity.InvoiceEntity
 import com.kaikeventura.expensemanager.entity.InvoiceState
+import com.kaikeventura.expensemanager.entity.InvoiceState.CURRENT
 import com.kaikeventura.expensemanager.entity.InvoiceWithReferenceProjection
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 interface InvoiceRepository : JpaRepository<InvoiceEntity, String> {
@@ -32,4 +34,15 @@ interface InvoiceRepository : JpaRepository<InvoiceEntity, String> {
         nativeQuery = true
     )
     fun findAllByUserIdAndReferenceMonthGreaterThanEqualLimitedTo(userId: String, referenceMonth: String, limit: Int): List<InvoiceEntity>
+
+    @Query(
+        value = """
+            SELECT i.id FROM invoices i
+            LEFT JOIN users u ON i.user_id = u.id
+            WHERE u.email = :userEmail
+            AND i.state = :state
+        """,
+        nativeQuery = true
+    )
+    fun findCurrentInvoiceByUserEmail(userEmail: String, state: InvoiceState = CURRENT): UUID?
 }

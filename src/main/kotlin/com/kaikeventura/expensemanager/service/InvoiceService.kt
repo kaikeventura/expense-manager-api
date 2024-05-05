@@ -132,6 +132,10 @@ class InvoiceService(
         }
     }
 
+    fun getCurrentInvoiceIdByUserEmail(userEmail: String): UUID =
+        invoiceRepository.findCurrentInvoiceByUserEmail(userEmail)
+            ?: throw InvoiceNotFoundException("Current invoice for user $userEmail not found")
+
     private fun InvoiceEntity.handleInvoiceCycle(currentYearMonth: YearMonth) {
         updateInvoice(
             invoice = this.copy(state = PREVIOUS)

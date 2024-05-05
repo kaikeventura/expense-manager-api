@@ -1,16 +1,20 @@
 package com.kaikeventura.expensemanager.service
 
+import com.kaikeventura.expensemanager.common.brazilZoneId
 import com.kaikeventura.expensemanager.controller.request.StatementRequest
 import com.kaikeventura.expensemanager.entity.InvoiceEntity
 import com.kaikeventura.expensemanager.entity.StatementEntity
 import com.kaikeventura.expensemanager.entity.StatementType.CREDIT_CARD
 import com.kaikeventura.expensemanager.entity.StatementType.FIXED
+import com.kaikeventura.expensemanager.error.exception.StatementNotFoundException
 import com.kaikeventura.expensemanager.error.exception.UserNotFoundException
 import com.kaikeventura.expensemanager.repository.StatementRepository
 import com.kaikeventura.expensemanager.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode.HALF_EVEN
+import java.time.YearMonth
+import java.util.UUID
 
 @Service
 class StatementService(
@@ -41,6 +45,23 @@ class StatementService(
             CREDIT_CARD -> createCreditCardStatement(userEmail, statementRequest)
             FIXED -> createMultipleStatementsForFixedExpense(userEmail, statementRequest)
             else -> createUniqueStatement(userEmail, statementRequest)
+        }
+    }
+
+    fun updateStatement(
+        userEmail: String,
+        statementCode: UUID,
+        statementRequest: StatementRequest
+    ) {
+        invoiceService.getCurrentInvoiceIdByUserEmail(
+            userEmail = userEmail
+        ).let { currentInvoiceId ->
+            statementRepository.findByCodeAndInvoiceId(
+                code = statementCode.toString(),
+                invoiceId = currentInvoiceId.toString()
+            )?.let { statement ->
+
+            } ?: throw StatementNotFoundException("Statement with code $statementCode on current invoice")
         }
     }
 
